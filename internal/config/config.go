@@ -18,9 +18,9 @@ type Config struct {
 }
 
 type Jwt struct {
-	Secret      string `yaml:"secret"`
-	ExpiresTime int    `yaml:"expires_time"`
-	BufferTime  int    `yaml:"buffer_time"`
+	Secret      string `yaml:"secret" json:"secret"`
+	ExpiresTime int    `yaml:"expires_time" json:"expires_time"`
+	BufferTime  int    `yaml:"buffer_time" json:"buffer_time"`
 }
 
 func init() {

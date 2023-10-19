@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"im/internal/controller/auth"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -23,6 +24,20 @@ var (
 					hello.NewV1(),
 				)
 			})
+
+			s.Group("/api", func(group *ghttp.RouterGroup) {
+				group.Middleware(
+					ghttp.MiddlewareHandlerResponse,
+					ghttp.MiddlewareCORS,
+				)
+
+				group.Group("/auth", func(g *ghttp.RouterGroup) {
+					g.Bind(
+						auth.CAuth,
+					)
+				})
+			})
+
 			s.Run()
 			return nil
 		},

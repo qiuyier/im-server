@@ -1,4 +1,6 @@
 package consts
 
-// JwtRedisCacheKeyFormat jwt cache
-const JwtRedisCacheKeyFormat = "JToken:%s:%s"
+const (
+	GTokenUserPrefix = "User:" //gToken登录 前台用户 前缀区分
+	CtxUserName      = "CtxUserName"
+)

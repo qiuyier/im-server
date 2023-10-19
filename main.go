@@ -7,8 +7,6 @@ import (
 
 	_ "im/internal/packed"
 
-	_ "im/internal/logic"
-
 	"github.com/gogf/gf/v2/os/gctx"
 
 	"im/internal/cmd"

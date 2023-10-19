@@ -2,7 +2,13 @@ module im
 
 go 1.18
 
-require github.com/gogf/gf/v2 v2.5.4
+require (
+	github.com/goflyfox/gtoken v1.5.10
+	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.5.4
+	github.com/gogf/gf/contrib/nosql/redis/v2 v2.5.4
+	github.com/gogf/gf/v2 v2.5.4
+	github.com/golang-jwt/jwt/v5 v5.0.0
+)
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
@@ -14,9 +20,6 @@ require (
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.5.4 // indirect
-	github.com/gogf/gf/contrib/nosql/redis/v2 v2.5.4 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect

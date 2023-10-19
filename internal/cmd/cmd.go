@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"im/internal/controller/auth"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -25,16 +24,24 @@ var (
 				)
 			})
 
+			// 启动商家前端gToken
+			gfUserToken, err := StartUserGToken()
+			if err != nil {
+				return err
+			}
+
 			s.Group("/api", func(group *ghttp.RouterGroup) {
 				group.Middleware(
 					ghttp.MiddlewareHandlerResponse,
 					ghttp.MiddlewareCORS,
 				)
 
-				group.Group("/auth", func(g *ghttp.RouterGroup) {
-					g.Bind(
-						auth.CAuth,
-					)
+				// 需要gToken
+				group.Group("/auth", func(group *ghttp.RouterGroup) {
+					err := gfUserToken.Middleware(ctx, group)
+					if err != nil {
+						panic(err)
+					}
 				})
 			})
 

@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/gogf/gf/v2/util/grand"
 	"im/internal/config"
 	"im/internal/consts"
 	"im/utility/util"
@@ -14,6 +15,7 @@ import (
 type UserInfo struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	UserId   int    `json:"user_id"`
 }
 
 type AuthLoginRes struct {
@@ -68,6 +70,7 @@ func loginFunc(r *ghttp.Request) (string, interface{}) {
 	userinfo := &UserInfo{
 		Username: username,
 		Password: password,
+		UserId:   grand.N(1, 10000),
 	}
 
 	return consts.GTokenUserPrefix + username, userinfo
@@ -133,5 +136,7 @@ func authAfterFunc(r *ghttp.Request, respData gtoken.Resp) {
 		r.ExitAll()
 	}
 	r.SetCtxVar(consts.CtxUserName, userInfo.Username)
+	r.SetCtxVar(consts.CtxUserId, userInfo.UserId)
+
 	r.Middleware.Next()
 }

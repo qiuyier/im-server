@@ -3,11 +3,15 @@ module im
 go 1.18
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/goflyfox/gtoken v1.5.10
 	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.5.4
 	github.com/gogf/gf/contrib/nosql/redis/v2 v2.5.4
 	github.com/gogf/gf/v2 v2.5.4
-	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/gorilla/websocket v1.5.0
+	github.com/orcaman/concurrent-map/v2 v2.0.1
+	github.com/sourcegraph/conc v0.3.0
+	golang.org/x/sync v0.1.0
 )
 
 require (
@@ -20,8 +24,8 @@ require (
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -33,6 +37,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.19.0 // indirect
 	go.opentelemetry.io/otel/trace v1.19.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect

@@ -6,10 +6,10 @@
 ### 说明
 
 #### cache
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;client.go里的client结构体的缓存服务接口定义及实现，用于将用户信息和用户客户端管理（绑定或解绑功能）
+&emsp;client.go里的client结构体的缓存服务接口定义及实现，用于将用户信息和用户客户端管理（绑定或解绑功能）
 
 #### timeWheel
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;基于gtimer实现的时间轮，用于定时执行任务，比如ack应答事件，客户端心跳维护
+&emsp;基于gtimer实现的时间轮，用于定时执行任务，比如ack应答事件，客户端心跳维护
 
 #### websocket
 - ack.go 消息确认机制，当客户端及时响应后把任务从时间轮删除，反之则重复下发
@@ -23,13 +23,13 @@
 - websocket.go 定义websocket客户端的操作处理，使用 Gorilla WebSocket 包作为底层实现
 
 #### serverSubscribe
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;websocket服务一部分，主要负责处理连接建立、消息订阅以及消息的处理和分发。
+&emsp;websocket服务一部分，主要负责处理连接建立、消息订阅以及消息的处理和分发。
 
 #### serverEvent
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;自定义回调事件具体实现，里面的方法实际上为event.go所使用的方法，同时也可以在里面添加对客户端发送过来的信息匹配对应处理事件，比如代码中的```onFoo```示例
+&emsp;自定义回调事件具体实现，里面的方法实际上为event.go所使用的方法，同时也可以在里面添加对客户端发送过来的信息匹配对应处理事件，比如代码中的```onFoo```示例
 
 #### serverConsume
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;获得redis订阅消息后的具体方法处理逻辑，通过内容的event字段判断具体调用对应的方法，并将处理好的消息结构发送到channel通道中等待发送
+&emsp;获得redis订阅消息后的具体方法处理逻辑，通过内容的event字段判断具体调用对应的方法，并将处理好的消息结构发送到channel通道中等待发送
 
 ### 流程
 

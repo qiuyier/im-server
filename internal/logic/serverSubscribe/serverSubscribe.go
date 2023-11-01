@@ -1,3 +1,6 @@
+// Package serverSubscribe websocket服务一部分
+// 主要负责处理连接建立、消息订阅以及消息的处理和分发。
+// 通过消息订阅，可以接收来自 Redis 的消息，然后将其分发给连接的客户端，实现了 WebSocket 通信的功能
 package serverSubscribe
 
 import (
@@ -34,7 +37,9 @@ func New() *sServerSubscribe {
 	}
 }
 
+// Conn 建立websocket连接
 func (s *sServerSubscribe) Conn(w http.ResponseWriter, r *http.Request) error {
+	// 将请求升级为websocket服务，并获取连接对象
 	conn, err := websocket.NewWebSocket(w, r)
 	if err != nil {
 		g.Log().Errorf(r.Context(), "websocket connect err: ", err)
@@ -44,6 +49,7 @@ func (s *sServerSubscribe) Conn(w http.ResponseWriter, r *http.Request) error {
 	return s.NewClient(service.Session().GetUid(r.Context()), conn)
 }
 
+// NewClient 将连接保存为自定义的客户端对象
 func (s *sServerSubscribe) NewClient(uid int, conn websocket.ISocket) error {
 	return websocket.NewClient(conn, &websocket.ClientOption{
 		Uid:     uid,
@@ -62,9 +68,11 @@ func (s *sServerSubscribe) NewClient(uid int, conn websocket.ISocket) error {
 	))
 }
 
+// Start 启动服务监听
 func (s *sServerSubscribe) Start(ctx context.Context, eg *errgroup.Group) {
+	// 使用Once保证全局只有一个监听器
+	// 不然假如有多个订阅者，redis会并行地将消息发送给所有监听者，导致同一消息会被重复消费
 	once.Do(func() {
-		// 注册消息订阅
 		eg.Go(func() error {
 			return s.SetUpMessageSubscribe(ctx)
 		})
@@ -81,6 +89,7 @@ func (s *sServerSubscribe) SetUpMessageSubscribe(ctx context.Context) error {
 	return nil
 }
 
+// redis订阅消息逻辑
 func (s *sServerSubscribe) subscribe(ctx context.Context, topic []string, consume service.IServerConsume) {
 	defaultTopic := consts.ImTopicFoo
 	conn, err := g.Redis().Conn(ctx)
@@ -110,6 +119,7 @@ func (s *sServerSubscribe) subscribe(ctx context.Context, topic []string, consum
 	}
 }
 
+// 处理订阅消息逻辑
 func (s *sServerSubscribe) handle(ctx context.Context, data *gredis.Message, consume service.IServerConsume) {
 	_ = grpool.Add(ctx, func(ctx context.Context) {
 		if j, err := gjson.DecodeToJson(data.Payload); err != nil {

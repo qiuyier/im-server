@@ -5,8 +5,9 @@ package time_wheel
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gtimer"
+	cmap "github.com/orcaman/concurrent-map/v2"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type TaskHandler[T any] func(*DefaultTimeWheel[T], string, T)
 // DefaultTimeWheel 时间轮定义
 type DefaultTimeWheel[T any] struct {
 	ctx      context.Context
-	cron     *gcron.Cron
+	slot     cmap.ConcurrentMap[string, *gtimer.Timer]
 	quitChan chan struct{}
 	taskChan chan bool
 	onTick   TaskHandler[T]
@@ -24,11 +25,9 @@ type DefaultTimeWheel[T any] struct {
 
 // NewTimeWheel 创建一个时间轮实例
 func NewTimeWheel[T any](handler TaskHandler[T]) *DefaultTimeWheel[T] {
-	cron := gcron.New()
-
 	timeWheel := &DefaultTimeWheel[T]{
 		ctx:      gctx.New(),
-		cron:     cron,
+		slot:     cmap.New[*gtimer.Timer](),
 		quitChan: make(chan struct{}),
 		onTick:   handler,
 	}
@@ -40,10 +39,9 @@ func (t *DefaultTimeWheel[T]) Start() {
 	for {
 		select {
 		case <-t.quitChan:
-			entries := t.cron.Entries()
-			for _, v := range entries {
-				t.cron.Remove(v.Name)
-			}
+			t.slot.IterCb(func(_ string, v *gtimer.Timer) {
+				v.Close()
+			})
 			return
 		}
 	}
@@ -54,24 +52,25 @@ func (t *DefaultTimeWheel[T]) Stop() {
 	close(t.quitChan)
 }
 
-// Add 添加定时任务
-func (t *DefaultTimeWheel[T]) Add(key, delay string, value T) {
-	_, err := t.cron.Add(t.ctx, delay, func(ctx context.Context) {
-		t.onTick(t, key, value)
-	}, key)
-	if err != nil {
-		panic(err)
-	}
-}
-
 // AddOnce 添加执行一次的定时任务
 func (t *DefaultTimeWheel[T]) AddOnce(key string, delay time.Duration, value T) {
-	t.cron.DelayAddOnce(t.ctx, delay, "* * * * * *", func(ctx context.Context) {
+	timer := gtimer.New()
+	timer.AddOnce(t.ctx, delay, func(ctx context.Context) {
 		t.onTick(t, key, value)
-	}, key)
+	})
+
+	if t.slot.Has(key) {
+		t.slot.Remove(key)
+	}
+
+	t.slot.Set(key, timer)
 }
 
 // Remove 移除指定名称的任务
 func (t *DefaultTimeWheel[T]) Remove(name string) {
-	t.cron.Remove(name)
+	if timer, ok := t.slot.Get(name); ok {
+		timer.Close()
+		t.slot.Remove(name)
+	}
+
 }

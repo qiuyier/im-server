@@ -3,7 +3,6 @@ package websocket
 
 import (
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/grpool"
@@ -23,6 +22,7 @@ type heartbeat struct {
 
 var health *heartbeat
 
+// 初始化时间轮
 func init() {
 	health = &heartbeat{}
 	health.timeWheel = time_wheel.NewTimeWheel[*Client](health._handler)
@@ -43,7 +43,7 @@ func (h *heartbeat) Start(ctx context.Context) error {
 
 // 向心跳时间轮中添加客户端
 func (h *heartbeat) insert(c *Client) {
-	h.timeWheel.Add(gconv.String(c.cid), fmt.Sprintf("*/%d * * * * *", heartbeatInterval), c)
+	h.timeWheel.AddOnce(gconv.String(c.cid), time.Duration(heartbeatInterval)*time.Second, c)
 }
 
 // 从心跳时间轮中移除客户端
@@ -52,7 +52,7 @@ func (h *heartbeat) delete(c *Client) {
 }
 
 // 心跳时间轮的任务处理函数，用于处理心跳检测任务
-func (h *heartbeat) _handler(_ *time_wheel.DefaultTimeWheel[*Client], _ string, c *Client) {
+func (h *heartbeat) _handler(timeWheel *time_wheel.DefaultTimeWheel[*Client], key string, c *Client) {
 	// 检查客户端是否已关闭，如果已关闭则不进行处理
 	if c.Closed() {
 		return
@@ -66,7 +66,9 @@ func (h *heartbeat) _handler(_ *time_wheel.DefaultTimeWheel[*Client], _ string, 
 	}
 
 	// 超过心跳间隔时间则主动推送一次消息
-	if interval > heartbeatInterval {
+	if interval >= heartbeatInterval {
 		_ = c.Write(&ClientResponse{Event: "ping"})
 	}
+
+	timeWheel.AddOnce(key, time.Duration(heartbeatInterval)*time.Second, c)
 }

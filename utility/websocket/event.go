@@ -7,8 +7,11 @@ import (
 )
 
 type IEvent interface {
+	// Open 客户端连接回调事件调用
 	Open(client IClient)
+	// Message 客户端消息回调事件调用
 	Message(client IClient, data []byte)
+	// Close 客户端连接关闭回调事件调用
 	Close(client IClient, code int, text string)
 }
 
@@ -28,6 +31,7 @@ type Event struct {
 func NewEvent(opts ...EventOption) IEvent {
 	o := &Event{}
 
+	// 绑定自定义回调事件
 	for _, opt := range opts {
 		opt(o)
 	}
@@ -77,18 +81,21 @@ func (e *Event) Close(client IClient, code int, text string) {
 	e.close(client, code, text)
 }
 
+// WithOpenEvent 绑定open事件
 func WithOpenEvent(e OpenEvent) EventOption {
 	return func(event *Event) {
 		event.open = e
 	}
 }
 
+// WithMessageEvent 绑定message事件
 func WithMessageEvent(e MessageEvent) EventOption {
 	return func(event *Event) {
 		event.message = e
 	}
 }
 
+// WithCloseEvent 绑定close事件
 func WithCloseEvent(e CloseEvent) EventOption {
 	return func(event *Event) {
 		event.close = e

@@ -14,8 +14,8 @@ var (
 )
 
 type session struct {
-	Foo      *Channel
-	channels map[string]*Channel
+	Foo      *Channel            // 渠道，可根据实际情况自行添加需要的渠道，将用户添加进不同渠道，利用不同渠道的消息通道发送对应的消息
+	channels map[string]*Channel // 保存了不同渠道的映射
 }
 
 func Init(ctx context.Context, eg *errgroup.Group, fn func(name string)) {
@@ -54,6 +54,7 @@ func initialize(ctx context.Context, eg *errgroup.Group, fn func(name string)) {
 	})
 }
 
+// Channel 判断渠道是否存在
 func (s *session) Channel(name string) (*Channel, bool) {
 	val, ok := s.channels[name]
 	return val, ok

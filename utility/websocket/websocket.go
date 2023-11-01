@@ -1,4 +1,4 @@
-// Package websocket 处理 WebSocket 连接
+// Package websocket 处理 WebSocket 连接，提供了一个通用的 WebSocket 连接管理接口，并使用 Gorilla WebSocket 包作为底层实现
 package websocket
 
 import (

@@ -45,6 +45,7 @@ type ClientOption struct {
 	Buffer  int         // 缓冲区大小根据业务, 自行调整
 }
 
+// ClientResponse 发送到客户端的消息结构体
 type ClientResponse struct {
 	IsAck   bool   `json:"-"`                 // 是否需要 ack 回调
 	Sid     string `json:"sid,omitempty"`     // ACK ID
@@ -153,6 +154,7 @@ func (c *Client) Close(code int, text string) {
 	}
 }
 
+// Closed 获取客户端状态
 func (c *Client) Closed() bool {
 	return atomic.LoadInt32(&c.closed) == 1
 }
@@ -166,6 +168,7 @@ func (c *Client) hookClose(code int, text string) error {
 	// 关闭消息发送通道 outChan
 	close(c.outChan)
 
+	// 调用客户端关闭回调事件
 	c.event.Close(c, code, text)
 
 	//解绑用户和客户端关系
@@ -199,6 +202,7 @@ func (c *Client) Uid() int {
 	return c.uid
 }
 
+// 持续监听客户端，获取客户端发送的消息
 func (c *Client) loopAccept() {
 	defer c.Close(1000, "loop accept closed")
 
@@ -215,6 +219,7 @@ func (c *Client) loopAccept() {
 	}
 }
 
+// 监听发送通道，向客户端发送消息
 func (c *Client) loopWrite() {
 	ctx := gctx.New()
 
@@ -258,6 +263,7 @@ func (c *Client) loopWrite() {
 	}
 }
 
+// 处理接收到客户端的消息
 func (c *Client) handleMessage(data []byte) {
 	event, err := c.isJsonEvent(data)
 	if err != nil {
@@ -280,6 +286,7 @@ func (c *Client) handleMessage(data []byte) {
 	}
 }
 
+// 判断消息体是否符合要求
 func (c *Client) isJsonEvent(data []byte) (string, error) {
 	if !gjson.Valid(data) {
 		return "", gerror.New("invalid json")

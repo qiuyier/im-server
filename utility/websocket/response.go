@@ -1,4 +1,4 @@
-// Package websocket 统一标准websocket消息返回结构体
+// Package websocket 统一标准发送到消息通道的消息结构体及设置方法
 package websocket
 
 type Message struct {
@@ -21,6 +21,7 @@ func NewMessage(event string, content any) *Message {
 	}
 }
 
+// NewSenderContent 发送到channel消息通道的结构体
 func NewSenderContent() *SenderContent {
 	return &SenderContent{
 		exclude:   make([]int64, 0),

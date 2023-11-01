@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
@@ -24,6 +23,18 @@ var (
 		Brief: "start http server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
+
+			eg, groupCtx := errgroup.WithContext(ctx)
+
+			// 启动消息订阅
+			time.AfterFunc(3*time.Second, func() {
+				service.ServerSubscribe().Start(ctx, eg)
+			})
+			// 初始化IM渠道配置
+			websocket.Init(groupCtx, eg, func(name string) {
+				g.Log().Errorf(ctx, "守护进程异常[%s]", name)
+			})
+
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
@@ -65,20 +76,8 @@ var (
 				}
 
 				group.ALL("/wss/wss.io", func(r *ghttp.Request) {
-					eg, groupCtx := errgroup.WithContext(ctx)
-
-					// 初始化IM渠道配置
-					websocket.Init(groupCtx, eg, func(name string) {
-						g.Dump("守护进程异常", fmt.Sprintf("守护进程异常[%s]", name))
-					})
-
 					c := make(chan os.Signal, 1)
 					signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
-
-					// 启动消息订阅
-					time.AfterFunc(3*time.Second, func() {
-						service.ServerSubscribe().Start(groupCtx, eg)
-					})
 
 					// 启动websocket连接
 					err = service.ServerSubscribe().Conn(r.Response.ResponseWriter, r.Request)

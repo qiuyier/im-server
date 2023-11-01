@@ -1,4 +1,4 @@
-// Package serverEvent 处理客户端发送的信息
+// Package serverEvent 自定义回调事件具体实现
 package serverEvent
 
 import (
@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/util/gconv"
 	"im/internal/consts"
 	"im/internal/model"
 	"im/internal/service"
@@ -47,9 +48,12 @@ func (s *sServerEvent) Call(ctx context.Context, client websocket.IClient, event
 
 // onFoo 示例
 func (s *sServerEvent) onFoo(ctx context.Context, client websocket.IClient, data []byte) {
-	_, err := g.Redis().Publish(ctx, consts.ImTopicBar, gjson.MustEncodeString(g.Map{
-		"event": consts.SubEventImMessageFoo,
-		"data":  gjson.MustEncodeString(model.FooMessage{ReceiverId: client.Uid()}),
+	_, err := g.Redis().Publish(ctx, consts.ImTopicBar, gjson.MustEncodeString(&model.SubscribeContent{
+		Event: consts.SubEventImMessageFoo,
+		Data: gjson.MustEncodeString(model.FooMessage{
+			ReceiverId: client.Uid(),
+			AcceptData: gconv.String(data),
+		}),
 	}))
 	if err != nil {
 		g.Log().Errorf(ctx, "onFoo publish err: ", err)

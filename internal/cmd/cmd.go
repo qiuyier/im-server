@@ -10,9 +10,6 @@ import (
 	"im/internal/controller/hello"
 	"im/internal/service"
 	"im/utility/websocket"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -76,9 +73,6 @@ var (
 				}
 
 				group.ALL("/wss/wss.io", func(r *ghttp.Request) {
-					c := make(chan os.Signal, 1)
-					signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
-
 					// 启动websocket连接
 					err = service.ServerSubscribe().Conn(r.Response.ResponseWriter, r.Request)
 					if err != nil {

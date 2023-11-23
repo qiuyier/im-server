@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/grpool"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -17,7 +18,6 @@ import (
 	"im/internal/service"
 	"im/utility/cache"
 	"im/utility/websocket"
-	"net/http"
 	"sync"
 )
 
@@ -38,15 +38,15 @@ func New() *sServerSubscribe {
 }
 
 // Conn 建立websocket连接
-func (s *sServerSubscribe) Conn(w http.ResponseWriter, r *http.Request) error {
+func (s *sServerSubscribe) Conn(r *ghttp.Request) error {
 	// 将请求升级为websocket服务，并获取连接对象
-	conn, err := websocket.NewWebSocket(w, r)
+	conn, err := websocket.NewGfWebSocket(r)
 	if err != nil {
 		g.Log().Errorf(r.Context(), "websocket connect err: ", err)
 		return err
 	}
 
-	return s.NewClient(service.Session().GetUid(r.Context()), conn)
+	return s.NewClient(service.Session().GetUid(r.Request.Context()), conn)
 }
 
 // NewClient 将连接保存为自定义的客户端对象

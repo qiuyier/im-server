@@ -2,8 +2,8 @@
 package websocket
 
 import (
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gorilla/websocket"
-	"net/http"
 )
 
 // ISocket 定义 WebSocket 连接的通用操作。它包括读数据、写数据、关闭连接以及设置连接关闭回调事件。
@@ -22,42 +22,32 @@ type ISocket interface {
 	SetCloseHandler(h func(code int, text string) error)
 }
 
-// WsConn 基于 Gorilla WebSocket 实现 ISocket
-type WsConn struct {
-	conn *websocket.Conn
+// GfConn GoFrame已封装好Gorilla，直接使用即可
+type GfConn struct {
+	conn *ghttp.WebSocket
 }
 
-// 配置 WebSocket 连接的参数
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-// NewWebSocket 创建一个 WebSocket 连接
-func NewWebSocket(w http.ResponseWriter, r *http.Request) (*WsConn, error) {
-	conn, err := upgrader.Upgrade(w, r, w.Header())
+func NewGfWebSocket(r *ghttp.Request) (*GfConn, error) {
+	conn, err := r.WebSocket()
 	if err != nil {
 		return nil, err
 	}
 
-	return &WsConn{conn: conn}, nil
+	return &GfConn{conn: conn}, nil
 }
 
-func (w *WsConn) Read() (int, []byte, error) {
+func (w *GfConn) Read() (int, []byte, error) {
 	return w.conn.ReadMessage()
 }
 
-func (w *WsConn) Write(bytes []byte) error {
+func (w *GfConn) Write(bytes []byte) error {
 	return w.conn.WriteMessage(websocket.TextMessage, bytes)
 }
 
-func (w *WsConn) Close() error {
+func (w *GfConn) Close() error {
 	return w.conn.Close()
 }
 
-func (w *WsConn) SetCloseHandler(h func(code int, text string) error) {
+func (w *GfConn) SetCloseHandler(h func(code int, text string) error) {
 	w.conn.SetCloseHandler(h)
 }

@@ -74,7 +74,7 @@ var (
 
 				group.ALL("/wss/wss.io", func(r *ghttp.Request) {
 					// 启动websocket连接
-					err = service.ServerSubscribe().Conn(r.Response.ResponseWriter, r.Request)
+					err = service.ServerSubscribe().Conn(r)
 					if err != nil {
 						panic(err)
 					}

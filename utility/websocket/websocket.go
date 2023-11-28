@@ -3,7 +3,6 @@ package websocket
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gorilla/websocket"
 )
 
 // ISocket 定义 WebSocket 连接的通用操作。它包括读数据、写数据、关闭连接以及设置连接关闭回调事件。
@@ -41,7 +40,7 @@ func (w *GfConn) Read() (int, []byte, error) {
 }
 
 func (w *GfConn) Write(bytes []byte) error {
-	return w.conn.WriteMessage(websocket.TextMessage, bytes)
+	return w.conn.WriteMessage(ghttp.WsMsgText, bytes)
 }
 
 func (w *GfConn) Close() error {

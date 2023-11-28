@@ -70,7 +70,7 @@ func (s *sServerEvent) OnOpen(client websocket.IClient) {
 func (s *sServerEvent) OnMessage(client websocket.IClient, data []byte) {
 	j, err := gjson.LoadJson(data)
 	if err != nil {
-		g.Log().Errorf(gctx.New(), "onMessage json unmarshall err: ", err)
+		g.Log().Errorf(gctx.New(), "onMessage json unmarshall err: %s", err.Error())
 		return
 	}
 

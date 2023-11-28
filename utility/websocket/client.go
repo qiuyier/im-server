@@ -239,7 +239,7 @@ func (c *Client) loopWrite() {
 
 			jsonObj, err := gjson.Marshal(data)
 			if err != nil {
-				g.Log().Errorf(ctx, "client json marshal err:", err)
+				g.Log().Errorf(ctx, "client json marshal err: %s", err.Error())
 				break
 			}
 

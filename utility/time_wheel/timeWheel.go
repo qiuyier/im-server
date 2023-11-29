@@ -19,7 +19,6 @@ type DefaultTimeWheel[T any] struct {
 	ctx      context.Context
 	slot     cmap.ConcurrentMap[string, *gtimer.Timer]
 	quitChan chan struct{}
-	taskChan chan bool
 	onTick   TaskHandler[T]
 }
 

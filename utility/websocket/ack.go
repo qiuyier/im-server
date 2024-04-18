@@ -75,6 +75,6 @@ func (a *Ack) _handler(_ *time_wheel.DefaultTimeWheel[*AckContent], _ string, ac
 
 	// 把需要下发的消息添加到发送通道，等待发送
 	if err := client.Write(ackContent.response); err != nil {
-		g.Log().Errorf(gctx.New(), "ack err: ", err)
+		g.Log().Errorf(gctx.New(), "ack err: %v", err)
 	}
 }
